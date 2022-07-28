@@ -66,3 +66,10 @@ The ability to claim a standard ticket
 The ability to claim a vip ticket(max 1)
 
 
+
+
+**Tackle next**
+Figure out AdminOnly situation.
+Create The BountyFactory.
+
+Once those are resolved move on to Front-end.

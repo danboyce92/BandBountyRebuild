@@ -47,6 +47,7 @@ contract BandBounty is Modifiers /*, PriceConsumerV3*/  {
 
 
     function setState(uint _state)public onlyOwner {
+        //onlyOwner needs to be set to onlyAdmin
         require(setStateCounter == 0, "State can only be changed once");
         require(state != 0, "State cannot be changed if bounty expires");
 
@@ -65,10 +66,15 @@ contract BandBounty is Modifiers /*, PriceConsumerV3*/  {
 
 
     function contribute() public payable notRed {
+        require(state != 3, "This Bounty is closed");
         uint expirationTime = deploymentTime + 90 days;
         uint currentTime = block.timestamp;
 
-        if(currentTime > expirationTime){
+        if(totalBountyBalance + msg.value >= target){
+            state = 3;
+        }
+
+        if(currentTime > expirationTime && state != 3){
             state = 0;
         }
 
@@ -126,22 +132,25 @@ contract BandBounty is Modifiers /*, PriceConsumerV3*/  {
 
         refundOnce[msg.sender] == true;
 
-        if(vipContributors[msg.sender] == true){
-            balances[msg.sender] += /*vipTicket()*/ 1000;
-        }
+            if(vipContributors[msg.sender] == true){
+                balances[msg.sender] += /*vipTicket()*/ 1000;
+            }
 
-        if(numberOfTickets[msg.sender] > 0){
-            balances[msg.sender] += /*standardTicket()*/ 500 * numberOfTickets[msg.sender];
-        }
-
+            if(numberOfTickets[msg.sender] > 0){
+                balances[msg.sender] += /*standardTicket()*/ 500 * numberOfTickets[msg.sender];
+            }
 
         payable (msg.sender).transfer(balances[msg.sender]);
 
         balances[msg.sender] = 0;
 
-
-
     }
+
+    function setTarget(uint256 _target) public greenOnly {
+        //needs onlyAdmin
+        target = _target;
+    }
+
 
 
     function withdrawFunds(address payable recipient) payable public onlyOwner bountyComplete {
