@@ -28,5 +28,10 @@ contract Modifiers {
         _;
     }
 
+    modifier bountyComplete() {
+        require(state == 3, "Must be in COMPLETE state");
+        _;
+    }
+
 
 }
