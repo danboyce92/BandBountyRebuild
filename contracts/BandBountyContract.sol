@@ -19,6 +19,7 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
     uint256 setStateCounter;
     uint256 public contributorsCount;
     uint256 target;
+    uint256 expirationTime = deploymentTime + 90 days;
 
 
     //Standard Tickets
@@ -68,7 +69,6 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
 
     function contribute() public payable notRed {
         require(state != 3, "This Bounty is closed");
-        uint expirationTime = deploymentTime + 90 days;
         uint currentTime = block.timestamp;
 
         if(totalBountyBalance + msg.value >= target){
@@ -160,6 +160,16 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
         //This function should be reserved for admin only
 
         recipient.transfer(totalBountyBalance);
+
+    }
+
+    //Can I invoke this function everytime frontend is refreshed?
+    function timeRemaining() public view returns (uint) {
+    if (expirationTime <= block.timestamp) {
+        return 0;
+    } else {
+        return expirationTime - block.timestamp;
+    }
 
     }
 
