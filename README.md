@@ -59,17 +59,23 @@ Contract Balance (Funds raised)
 Contract state (Early stage, Confirmed, Complete, Expired)
 Funds Target
 Expiration time / deadline
+List of Bounties
 
 *Important functions needed-*
 The ability to add funds to a Bounty (contribute)
 The ability to claim a standard ticket
 The ability to claim a vip ticket(max 1)
+Need to create a countdown timer for expiring bounties?
 
 
 
 
 **Tackle next**
-Figure out AdminOnly situation.
-Create The BountyFactory.
+Figure out AdminOnly situation. ✓
+Create The BountyFactory. ✓
+Before deploying decide on what variables need to be public / which ones need to be accessed by frontend
+I need a way to convert all wei balances into eth (This can probably be done in front end)
+
+
 
 Once those are resolved move on to Front-end.

@@ -5,7 +5,7 @@ pragma solidity <0.9.0;
 import './ModifiersContract.sol';
 import './PriceFeed.sol';
 
-contract BandBounty is Modifiers /*, PriceConsumerV3*/  {
+contract Bounty is Modifiers /*, PriceConsumerV3*/  {
 
     //Mappings
     mapping(address => uint) public balances;
@@ -35,7 +35,8 @@ contract BandBounty is Modifiers /*, PriceConsumerV3*/  {
 
     
 
-    constructor() {
+    constructor(address manager) payable {
+        //manager here is creator of bounty, not admin
         manager = msg.sender;
         state = 1;
         deploymentTime = block.timestamp;
@@ -46,7 +47,7 @@ contract BandBounty is Modifiers /*, PriceConsumerV3*/  {
     //Functions
 
 
-    function setState(uint _state)public onlyOwner {
+    function setState(uint _state)public onlyAdmin {
         //onlyOwner needs to be set to onlyAdmin
         require(setStateCounter == 0, "State can only be changed once");
         require(state != 0, "State cannot be changed if bounty expires");
@@ -153,7 +154,7 @@ contract BandBounty is Modifiers /*, PriceConsumerV3*/  {
 
 
 
-    function withdrawFunds(address payable recipient) payable public onlyOwner bountyComplete {
+    function withdrawFunds(address payable recipient) payable public onlyAdmin bountyComplete {
         //onlyOwner doesn't work here
         //This would allow the user who created the bounty to withdraw
         //This function should be reserved for admin only

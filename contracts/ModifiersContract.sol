@@ -4,12 +4,13 @@ pragma solidity <0.9.0;
 
 contract Modifiers {
 
-    address manager;
+    //this is my metamask account used to demo this project
+    address admin = 0x5C3d553769D4473d53dF67b04Eb0f51D3C7705D8;
     uint public state;
 
 
-    modifier onlyOwner() {
-        require(msg.sender == manager);
+    modifier onlyAdmin() {
+        require(msg.sender == admin);
         _;
     }
 
