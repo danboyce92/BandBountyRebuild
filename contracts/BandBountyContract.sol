@@ -18,8 +18,10 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
     uint256 public deploymentTime;
     uint256 setStateCounter;
     uint256 public contributorsCount;
-    uint256 target;
-    uint256 expirationTime = deploymentTime + 90 days;
+    uint256 public target;
+    uint256 public ninetyDays = 90 days;
+    uint256 public expirationTime;
+    uint256 public currentTime = block.timestamp;
 
 
     //Standard Tickets
@@ -40,7 +42,9 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
         //manager here is creator of bounty, not admin
         manager = msg.sender;
         state = 1;
-        deploymentTime = block.timestamp;
+        deploymentTime = currentTime;
+        expirationTime = currentTime += 90 days;
+        target = 50 ether;
 
     }
 
@@ -58,7 +62,8 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
 
         //This updates deadline if bounty is greenlit
         if(_state == 2){
-            deploymentTime = block.timestamp;
+            deploymentTime = currentTime;
+            expirationTime = currentTime += 90 days;
 
         }
         //To prevent state being exploited by admin
@@ -69,7 +74,9 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
 
     function contribute() public payable notRed {
         require(state != 3, "This Bounty is closed");
-        uint currentTime = block.timestamp;
+
+        currentTime = block.timestamp;
+        
 
         if(totalBountyBalance + msg.value >= target){
             state = 3;
@@ -78,6 +85,7 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
         if(currentTime > expirationTime && state != 3){
             state = 0;
         }
+
 
         /* Contributors allows front end to keep track
         of number of people involved */
@@ -92,6 +100,7 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
 
         //Update the contracts Total Balance
         totalBountyBalance += msg.value;
+        
 
 
     }

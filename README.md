@@ -66,6 +66,7 @@ The ability to add funds to a Bounty (contribute)
 The ability to claim a standard ticket
 The ability to claim a vip ticket(max 1)
 Need to create a countdown timer for expiring bounties?
+Need to set target from frontend (convert Eth to Wei)
 
 
 
