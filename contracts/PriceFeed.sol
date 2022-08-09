@@ -11,6 +11,8 @@ contract PriceConsumerV3 {
     int minRequiredUSD;
     int etherPriceUSD;
     int public minRequiredEther;
+    int public demoStandardPrice;
+    int public demoVipPrice;
 
     /**
      * Network: Rinkeby
@@ -53,6 +55,17 @@ contract PriceConsumerV3 {
 
     function vipTicket() public view returns(uint256) {
         uint256 vipAdjustedPrice = uint256(minRequiredEther * 2);
+        return vipAdjustedPrice;
+    }
+
+    function getDemoStandardPrice() public view returns(uint256) {
+        uint256 adjustedPrice = uint256(minRequiredEther / 10);
+        return adjustedPrice;
+    }
+
+    function getDemoVipPrice() public view returns(uint256) {
+        uint256 newNumber = uint256(minRequiredEther / 10);
+        uint256 vipAdjustedPrice = uint256(newNumber * 2);
         return vipAdjustedPrice;
     }
 

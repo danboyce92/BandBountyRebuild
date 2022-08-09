@@ -5,28 +5,28 @@ pragma solidity <0.9.0;
 import './ModifiersContract.sol';
 import './PriceFeed.sol';
 
-contract Bounty is Modifiers /*, PriceConsumerV3*/  {
+contract Bounty is Modifiers , PriceConsumerV3  {
 
     //Mappings
-    mapping(address => uint) public balances;
+    mapping(address => uint) balances;
     mapping(address => uint) contributors;
     mapping(address => bool) vipContributors;
 
 
     //Variables
-    uint256 public totalBountyBalance;
-    uint256 public deploymentTime;
+    uint256 private totalBountyBalance;
+    uint256 deploymentTime;
     uint256 setStateCounter;
-    uint256 public contributorsCount;
-    uint256 public target;
-    uint256 public ninetyDays = 90 days;
-    uint256 public expirationTime;
-    uint256 public currentTime = block.timestamp;
+    uint256 private contributorsCount;
+    uint256 private target;
+    uint256 expirationTime;
+    uint256 currentTime = block.timestamp;
 
 
     //Standard Tickets
-    uint256 public standardTicketCounter = 0;
-    address[10000] public standardTicketHolders;
+    uint256 standardTicketCounter = 0;
+    address[10000] standardTicketHolders;
+    mapping(address => uint) private standardTicketsOwned;
 
     //VIP Tickets
     uint256 vipTicketCounter = 0;
@@ -35,6 +35,10 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
     //Refund mappings
     mapping(address => uint) numberOfTickets;
     mapping(address => bool) refundOnce;
+
+    //Refund mappings to store price user paid for ticket
+    mapping(address => uint) standardUserCost;
+    mapping(address => uint) vipUserCost;
 
     
 
@@ -108,31 +112,45 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
     //Adding contributors to their group Standard or Vip
     
     function claimStandardTicket() public payable notRed {
-        require(balances[msg.sender] >= /*standardTicket()*/ 500, "Not enough funds");
+        require(balances[msg.sender] >= /*standardTicket()*/ getDemoStandardPrice(), "Not enough funds");
+
+        uint standardTicketCost = getDemoStandardPrice();
 
             //deduct cost first
-            balances[msg.sender] -= /*standardTicket()*/ 500;
+            balances[msg.sender] -= /*standardTicket()*/ standardTicketCost;
 
             standardTicketHolders[standardTicketCounter] = msg.sender;
             standardTicketCounter++;
 
+            //So users can keep track of how many tickets they own
+            standardTicketsOwned[msg.sender]++;
+
             //for refund function
             numberOfTickets[msg.sender]++;
+
+            //to store price paid in case of refund
+            standardUserCost[msg.sender] = standardTicketCost;
         
     }
 
     function claimVipTicket() public payable greenOnly notRed {
         require(vipTicketCounter < 101, "Vip List full");
-        require(balances[msg.sender] >= /*vipTicket()*/ 1000, "Not enough funds");
+        require(balances[msg.sender] >= /*vipTicket()*/ getDemoVipPrice(), "Not enough funds");
+        
+        uint vipTicketCost = getDemoVipPrice();
+
         //1 Vip ticket per person
         require(vipContributors[msg.sender] == false);
 
             //deduct cost first
-            balances[msg.sender] -= /*vipTicket()*/ 1000;
+            balances[msg.sender] -= /*vipTicket()*/ vipTicketCost;
             
             vipContributors[msg.sender] = true;
             vipTicketHolders[vipTicketCounter] = msg.sender;
             vipTicketCounter++;
+
+            //to store price paid in case of refund
+            vipUserCost[msg.sender] = vipTicketCost;
 
     }
 
@@ -143,11 +161,11 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
         refundOnce[msg.sender] == true;
 
             if(vipContributors[msg.sender] == true){
-                balances[msg.sender] += /*vipTicket()*/ 1000;
+                balances[msg.sender] += /*vipTicket()*/ vipUserCost[msg.sender];
             }
 
             if(numberOfTickets[msg.sender] > 0){
-                balances[msg.sender] += /*standardTicket()*/ 500 * numberOfTickets[msg.sender];
+                balances[msg.sender] += /*standardTicket()*/ standardUserCost[msg.sender] * numberOfTickets[msg.sender];
             }
 
         payable (msg.sender).transfer(balances[msg.sender]);
@@ -156,7 +174,7 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
 
     }
 
-    function setTarget(uint256 _target) public greenOnly {
+    function setTarget(uint256 _target) public greenOnly onlyAdmin {
         //needs onlyAdmin
         target = _target;
     }
@@ -182,5 +200,28 @@ contract Bounty is Modifiers /*, PriceConsumerV3*/  {
 
     }
 
+
+
+    //Getter functions
+
+    function getTotalBountyBalance() public view returns(uint) {
+        return totalBountyBalance;
+    }
+
+    function getContributorsCount() public view returns(uint) {
+        return contributorsCount;
+    }
+
+    function getTarget() public view returns(uint) {
+        return target;
+    }
+
+    function getUserBalance(address user) public view returns(uint) {
+        return balances[user];
+    }
+
+    function getStandardTicketsOwned(address user) public view returns(uint) {
+        return standardTicketsOwned[user];
+    }
 
 }

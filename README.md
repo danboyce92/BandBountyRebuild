@@ -77,6 +77,8 @@ Create The BountyFactory. ✓
 Before deploying decide on what variables need to be public / which ones need to be accessed by frontend
 I need a way to convert all wei balances into eth (This can probably be done in front end)
 
+Make a getter page and turn all public variables into private
+
 
 
 Once those are resolved move on to Front-end.
