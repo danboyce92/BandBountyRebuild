@@ -82,3 +82,6 @@ Make a getter page and turn all public variables into private
 
 
 Once those are resolved move on to Front-end.
+
+_________________
+Hit a wall.. hooking up front end to smart contract. How do I hook it up to factory not bounty contract. 
